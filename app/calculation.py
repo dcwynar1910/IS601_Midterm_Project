@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import logging
 from app.exceptions import OperationError
 
@@ -9,8 +9,8 @@ class Calculation:
     operation: str
     operand1: Decimal
     operand2: Decimal
-    solution: Decimal
-    timestamp: datetime.datetime = datetime.datetime.now
+    solution: Decimal = field(init = False)
+    timestamp: datetime.datetime = field(default_factory=datetime.datetime.now)
 
     def __post_init__(self):
         self.solution = self.calculate()
@@ -51,8 +51,8 @@ class Calculation:
                 operand2= data["operand2"]
             )
 
-            saved_result = Decimal(data['result'])
-            if calc.result != saved_result:
+            saved_result = Decimal(data['solution'])
+            if calc.solution != saved_result:
                 logging.warning(
                     f"Loaded calculation result {saved_result} "
                     f"differs from computed result {calc.solution}"
@@ -73,7 +73,7 @@ class Calculation:
             f"Calculation(operation='{self.operation}', "
             f"operand1={self.operand1}, "
             f"operand2={self.operand2}, "
-            f"result={self.solution}, "
+            f"solution={self.solution}, "
             f"timestamp='{self.timestamp.isoformat()}')"
         )
     
@@ -82,6 +82,17 @@ class Calculation:
             return str(self.solution.quantize(Decimal("0." + "0" * precision)))
         except:
             return str(self.solution)
+        
+    def __eq__(self, other):
+   
+        if not isinstance(other, Calculation):
+            return NotImplemented
+        return (
+            self.operation == other.operation and
+            self.operand1 == other.operand1 and
+            self.operand2 == other.operand2 and
+            self.solution == other.solution
+        )
 
 
 

@@ -1,5 +1,5 @@
 import datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from dataclasses import dataclass, field
 import logging
 from app.exceptions import OperationError
@@ -25,7 +25,7 @@ class Calculation:
             "Root" : lambda a,b : a**(1/b),
             "Modulus" : lambda a,b : a%b,
             "Integer_Division" : lambda a,b : a//b,
-            "Percentage" : lambda a,b : (a*b)*100,
+            "Percentage" : lambda a,b : (a/b)*100,
             "Absolute_Difference" : lambda a,b : abs(a-b)
             }
         
@@ -38,7 +38,7 @@ class Calculation:
         
         try:
             return cur_operation(self.operand1, self.operand2)
-        except (ValueError) as e:
+        except (ValueError, TypeError) as e:
             raise OperationError("Calculation failed:", {str(e)})
 
 
@@ -47,8 +47,8 @@ class Calculation:
         try:
             calc = Calculation(
                 operation = data["operation"],
-                operand1= data["operand1"],
-                operand2= data["operand2"]
+                operand1= Decimal(data["operand1"]),
+                operand2= Decimal(data["operand2"])
             )
 
             saved_result = Decimal(data['solution'])
@@ -60,7 +60,7 @@ class Calculation:
 
             return calc
         
-        except (KeyError, ValueError) as e:
+        except (KeyError, ValueError, InvalidOperation) as e:
             raise OperationError(f"Invalid calculation data: {str(e)}")
 
 
@@ -80,7 +80,7 @@ class Calculation:
     def format_result(self, precision = 10):
         try:
             return str(self.solution.quantize(Decimal("0." + "0" * precision)))
-        except:
+        except: # pragma: no cover
             return str(self.solution)
         
     def __eq__(self, other):

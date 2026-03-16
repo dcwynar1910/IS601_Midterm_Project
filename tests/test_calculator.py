@@ -178,3 +178,48 @@ def test_calculator_repl_help(mock_print, mock_input):
 def test_calculator_repl_addition(mock_print, mock_input):
     calculator_repl()
     mock_print.assert_any_call("Result: 5")
+
+
+@patch('builtins.input', side_effect=['clear', 'add', '1', '1', 'undo', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_undo(mock_print, mock_input):
+    calculator_repl()
+    mock_print.assert_any_call("Command undone!")
+
+@patch('builtins.input', side_effect=['clear', 'undo', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_undo_nothing_to_do(mock_print, mock_input):
+    calculator_repl()
+    mock_print.assert_any_call("Nothing to undo")
+
+@patch('builtins.input', side_effect=['clear', 'redo', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_redo_nothing_to_do(mock_print, mock_input):
+    calculator_repl()
+    mock_print.assert_any_call("Nothing to redo")
+
+@patch('builtins.input', side_effect=['clear', 'add', '1', '1', 'undo', 'redo', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_redo(mock_print, mock_input):
+    calculator_repl()
+    mock_print.assert_any_call("Command redone!")
+
+@patch('builtins.input', side_effect=['clear', 'add', '1', '1', 'save', 'load', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_save_load(mock_print, mock_input):
+    calculator_repl()
+    mock_print.assert_any_call("History saved!")
+    mock_print.assert_any_call("History loaded!")
+
+@patch('builtins.input', side_effect=['clear', 'add', '1', '1', 'save', 'exit'])
+@patch('builtins.print')
+@patch('pandas.DataFrame.to_csv', side_effect=Exception())
+def test_calculator_repl_load_fail(mock_print, mock_input, mock_to_csv):
+    calculator_repl()
+
+@patch('builtins.input', side_effect=['blah', 'exit'])
+@patch('builtins.print')
+@patch('os.makedirs', side_effect=Exception())
+def test_calculator_bad_command(mock_print, mock_input, mock_mkdirs):
+    with pytest.raises(Exception):
+        calculator_repl()

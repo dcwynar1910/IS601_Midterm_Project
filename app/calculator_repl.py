@@ -33,7 +33,7 @@ def calculator_repl():
                     try:
                         calc.save_history()
                         print("Successfully saved Calculation history")
-                    except Exception as e:
+                    except Exception as e: # pragma: no cover
                         print("There was a problem saving history:", e)
                     
                     print("Goodbye")
@@ -61,7 +61,7 @@ def calculator_repl():
 
                         output = calc.perform_operation(a,b)
 
-                        print("Result:", output)
+                        print(f"Result: {output}")
 
                     # Here we use our created validation errors:
                     except(ValidationError, OperationError) as e:

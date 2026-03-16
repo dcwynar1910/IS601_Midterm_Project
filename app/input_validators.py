@@ -16,6 +16,6 @@ class InputValidator:
             return value_normalized.normalize()
         
         except InvalidOperation as e:
-            raise ValidationError("Invalid number format:", value) from e
+            raise ValidationError(f"Invalid number format: {value}") from e
         
 

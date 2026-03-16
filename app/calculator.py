@@ -156,6 +156,8 @@ class Calculator:
 
             return solution
         
+        except ValidationError:
+            raise
         except Exception as e:
             logging.error(f"Operation failed to perform: {e}")
             raise OperationError("Operation failed to perform:", e)
@@ -194,7 +196,7 @@ class Calculator:
         self.redo_stack.append(CalculatorMemento(self.history.copy()))
         self.history = memento.history.copy()
 
-        self.save_history()
+        #self.save_history()
         return True
     
 
@@ -206,7 +208,7 @@ class Calculator:
         self.undo_stack.append(CalculatorMemento(self.history.copy()))
         self.history = memento.history.copy()
 
-        self.save_history()
+        #self.save_history()
         return True
     
 

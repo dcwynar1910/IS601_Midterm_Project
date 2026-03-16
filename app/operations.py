@@ -7,7 +7,7 @@ from app.exceptions import ValidationError
 class Operation(ABC):
     @abstractmethod
     def execute(self, a: Decimal, b: Decimal)-> Decimal:
-        pass
+        pass # pragma: no cover
 
     def validate_operands(self, a: Decimal, b: Decimal)-> Decimal:
         pass
@@ -142,6 +142,6 @@ class OperationFactory:
         create_operation_class = cls.available_operations.get(operation_type.lower())
 
         if not create_operation_class:
-            raise ValueError("Invalid operation:", operation_type)
+            raise ValueError(f"Invalid operation: {operation_type}")
         
         return create_operation_class()

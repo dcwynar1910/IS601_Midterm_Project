@@ -22,4 +22,4 @@ class CalculatorMemento:
         for i in data["history"]:
             to_list.append(Calculation.from_dict(i))
 
-        return cls(history=to_list, timestamp=datetime.datetime.fromisoformat()(data['timestamp']))
+        return cls(history=to_list, timestamp=datetime.datetime.fromisoformat((data['timestamp'])))

@@ -15,7 +15,7 @@ class LoggingObserver(HistoryObserver):
         
         logging.info(f"Calculation Performed: {calculation.operation} "
                     f"({calculation.operand1}, {calculation.operand2}) = "
-                    f"{calculation.result}")
+                    f"{calculation.solution}")
         
 
 

@@ -37,7 +37,7 @@ class Calculator:
         try:
             self.load_history()
         except Exception as e:
-            logging.warning("Attempt to load history failed:", e)
+            logging.warning(f"Attempt to load history failed: {e}")
 
         logging.info("Initializing of calculator successful")
 
@@ -45,8 +45,8 @@ class Calculator:
     def setup_logging(self):
         # Logging section for the developer to use
         try:
-            os.makedirs(self.config.log_dir, exist_ok = True)
-            log_file = self.config.log_file.resolve()
+            os.makedirs(self.config.return_log_dir, exist_ok = True)
+            log_file = self.config.return_log_file.resolve()
 
             logging.basicConfig(
                 filename=str(log_file),
@@ -54,7 +54,7 @@ class Calculator:
                 format='%(asctime)s - %(levelname)s - %(message)s',
                 force=True  
             )
-            logging.info("Logging initialized at:", log_file)
+            logging.info(f"Logging initialized at: {log_file}")
 
         except Exception as e:
             print("Error setting up logging", e) # print instead of log
@@ -63,8 +63,8 @@ class Calculator:
 
     def load_history(self):
         try:
-            if self.config.history_file.exists():
-                df = pd.read_csv(self.config.history_file)
+            if self.config.return_history_file.exists():
+                df = pd.read_csv(self.config.return_history_file)
                 self.history = []
                 
                 if not df.empty:
@@ -78,15 +78,15 @@ class Calculator:
                                 'timestamp': i['timestamp']
                             })
                         self.history.append(loading_row)
-                    logging.info("Completed loading", len(self.history), "rows from history")
+                    logging.info(f"Completed loading {len(self.history)} rows from history")
                 else:
                     logging.info("Completed loading empty history file")
             else:
                 logging.info("History file not found - starting from scratch")
 
         except Exception as e:
-            logging.error("Failed to load history file:", e)
-            raise OperationError("Failed to load history file:", e)
+            logging.error(f"Failed to load history file: {e}")
+            raise OperationError(f"Failed to load history file: {e}")
         
     def save_history(self):
         try:
@@ -104,25 +104,25 @@ class Calculator:
 
             if cur_history != []:
                 df = pd.DataFrame(cur_history)
-                df.to_csv(self.config.history_file, index=False)
-                logging.info("History saved successfully to:", self.config.history_file)
+                df.to_csv(self.config.return_history_file, index=False)
+                logging.info(f"History saved successfully to: self.config.history_file")
             else:
                 pd.DataFrame(columns=['operation', 'operand1', 'operand2', 'solution', 'timestamp']
-                           ).to_csv(self.config.history_file, index=False)
+                           ).to_csv(self.config.return_history_file, index=False)
                 logging.info("History saved with empty data")
 
         except Exception as e:
-            logging.error("Failed to save history", e)
+            logging.error(f"Failed to save history {e}")
             raise OperationError("Failed to save history", e)
         
 
     def add_observer(self, observer):
         self.observers.append(observer)
-        logging.info("Added observer:", observer)
+        logging.info(f"Added observer: {observer}")
 
     def remove_observer(self, observer):
         self.observers.remove(observer)
-        logging.info("Removed observer:", observer)
+        logging.info(f"Removed observer: {observer}")
 
     def notify_observers(self, calculation):
         for i in self.observers:
@@ -132,7 +132,7 @@ class Calculator:
 
     def set_operation(self, operation):
         self.cur_operation = operation
-        logging.info("Setting operation to:", operation)
+        logging.info(f"Setting operation to: {operation}")
 
     def perform_operation(self, a,b):
         if self.cur_operation == None or self.cur_operation is None:
@@ -157,7 +157,7 @@ class Calculator:
             return solution
         
         except Exception as e:
-            logging.error("Operation failed to perform:", e)
+            logging.error(f"Operation failed to perform: {e}")
             raise OperationError("Operation failed to perform:", e)
         
     
@@ -187,28 +187,26 @@ class Calculator:
         logging.info("Successfully cleared history")
 
     def undo(self):
-        if self.undo_stack == []:
+        if not self.undo_stack:
             return False
         
         memento = self.undo_stack.pop()
         self.redo_stack.append(CalculatorMemento(self.history.copy()))
         self.history = memento.history.copy()
+
+        self.save_history()
         return True
     
 
     def redo(self):
-        if self.redo_stack == []:
+        if not self.redo_stack:
             return False
         
         memento = self.redo_stack.pop()
         self.undo_stack.append(CalculatorMemento(self.history.copy()))
         self.history = memento.history.copy()
+
+        self.save_history()
         return True
     
 
-        
-
-
-
-
-a = Calculator()

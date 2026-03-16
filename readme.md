@@ -18,7 +18,7 @@ Once the project is successfully downloaded enter into it using cd in the termin
 Once you are in let us create a Python virtual enviroment by doing python3 -m venv venv
 Next activate it by doing source venv/bin/activate
 There should now be a (venv) next to your username on the left!
-Install dependencies: pip install -r requirement.txt
+Install dependencies: pip install -r requirements.txt
 You have finished the command line set up, run python main.py to start the calculator
 
 For the .env it is all dynamic so you do not have to worry about configuring it, although if you would like to, here are the variables
